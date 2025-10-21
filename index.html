@@ -1,0 +1,653 @@
+<!doctype html>
+<html lang="en">
+ <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Prompt Fight Club</title>
+  <style>
+        body {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Comic Sans MS', cursive, sans-serif;
+            background: white;
+            color: #333;
+            line-height: 1.6;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        /* Header Styles */
+        .header {
+            background: linear-gradient(135deg, #ff6b6b, #4ecdc4);
+            padding: 2rem 1rem;
+            text-align: center;
+            border-bottom: 4px solid #333;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: repeating-linear-gradient(
+                45deg,
+                transparent,
+                transparent 10px,
+                rgba(255,255,255,0.1) 10px,
+                rgba(255,255,255,0.1) 20px
+            );
+            animation: float 20s linear infinite;
+        }
+
+        @keyframes float {
+            0% { transform: translateX(-50px); }
+            100% { transform: translateX(50px); }
+        }
+
+        .logo {
+            font-size: 3rem;
+            font-weight: bold;
+            color: white;
+            text-shadow: 4px 4px 0px #333, 8px 8px 0px rgba(0,0,0,0.3);
+            margin-bottom: 0.5rem;
+            position: relative;
+            z-index: 2;
+        }
+
+        .subtitle {
+            font-size: 1.2rem;
+            color: #333;
+            background: white;
+            padding: 0.5rem 1rem;
+            border: 3px solid #333;
+            border-radius: 20px;
+            display: inline-block;
+            margin-bottom: 1.5rem;
+            position: relative;
+            z-index: 2;
+        }
+
+        .start-btn {
+            background: #ff6b6b;
+            color: white;
+            border: 4px solid #333;
+            padding: 1rem 2rem;
+            font-size: 1.2rem;
+            font-weight: bold;
+            border-radius: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            position: relative;
+            z-index: 2;
+        }
+
+        .start-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 0 #333, 0 10px 20px rgba(0,0,0,0.3);
+        }
+
+        /* Arena Styles */
+        .arena {
+            padding: 3rem 1rem;
+            background: linear-gradient(45deg, #ffd93d, #ff6b6b);
+            position: relative;
+            min-height: 80vh;
+        }
+
+        .arena-ring {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: white;
+            border: 6px solid #333;
+            border-radius: 50px;
+            padding: 2rem;
+            position: relative;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+
+        .round-title {
+            text-align: center;
+            font-size: 2rem;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 2rem;
+            background: #ffd93d;
+            padding: 1rem;
+            border: 4px solid #333;
+            border-radius: 25px;
+            text-shadow: 2px 2px 0px white;
+        }
+
+        .fighters {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .fighter {
+            text-align: center;
+            padding: 1.5rem;
+            border: 4px solid #333;
+            border-radius: 25px;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+
+        .fighter.chatgpt {
+            background: linear-gradient(135deg, #4ecdc4, #44a08d);
+        }
+
+        .fighter.midjourney {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+        }
+
+        .fighter.claude {
+            background: linear-gradient(135deg, #f093fb, #f5576c);
+        }
+
+        .fighter.dalle {
+            background: linear-gradient(135deg, #4facfe, #00f2fe);
+        }
+
+        .fighter-face {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            display: block;
+        }
+
+        .fighter-name {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: white;
+            text-shadow: 2px 2px 0px #333;
+            margin-bottom: 0.5rem;
+        }
+
+        .fighter-type {
+            background: white;
+            color: #333;
+            padding: 0.3rem 0.8rem;
+            border: 2px solid #333;
+            border-radius: 15px;
+            font-size: 0.9rem;
+            font-weight: bold;
+        }
+
+        .results {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .speech-bubble {
+            background: white;
+            border: 4px solid #333;
+            border-radius: 25px;
+            padding: 1.5rem;
+            position: relative;
+            min-height: 150px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            animation: bubble-pop 0.5s ease-out;
+        }
+
+        @keyframes bubble-pop {
+            0% { transform: scale(0.8); opacity: 0; }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        .speech-bubble::before {
+            content: '';
+            position: absolute;
+            bottom: -15px;
+            left: 30px;
+            width: 0;
+            height: 0;
+            border-left: 15px solid transparent;
+            border-right: 15px solid transparent;
+            border-top: 15px solid #333;
+        }
+
+        .speech-bubble::after {
+            content: '';
+            position: absolute;
+            bottom: -11px;
+            left: 32px;
+            width: 0;
+            height: 0;
+            border-left: 13px solid transparent;
+            border-right: 13px solid transparent;
+            border-top: 13px solid white;
+        }
+
+        .result-text {
+            font-size: 1.1rem;
+            text-align: center;
+            font-weight: bold;
+        }
+
+        .result-image {
+            width: 100%;
+            max-width: 200px;
+            height: 120px;
+            background: #f0f0f0;
+            border: 2px solid #333;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+        }
+
+        .winner-section {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .choose-winner-btn {
+            background: #ffd93d;
+            color: #333;
+            border: 4px solid #333;
+            padding: 1rem 2rem;
+            font-size: 1.2rem;
+            font-weight: bold;
+            border-radius: 15px;
+            cursor: pointer;
+            margin: 0 1rem;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+        }
+
+        .choose-winner-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 0 #333;
+        }
+
+        .comic-effect {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 6rem;
+            font-weight: bold;
+            color: #ff6b6b;
+            text-shadow: 4px 4px 0px #333, 8px 8px 0px rgba(0,0,0,0.3);
+            z-index: 1000;
+            animation: pow-effect 1s ease-out;
+            pointer-events: none;
+        }
+
+        @keyframes pow-effect {
+            0% { transform: translate(-50%, -50%) scale(0); opacity: 0; }
+            50% { transform: translate(-50%, -50%) scale(1.2); opacity: 1; }
+            100% { transform: translate(-50%, -50%) scale(1); opacity: 0; }
+        }
+
+        /* Gallery Styles */
+        .gallery {
+            padding: 3rem 1rem;
+            background: #f8f9fa;
+        }
+
+        .gallery-title {
+            text-align: center;
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 2rem;
+            text-shadow: 2px 2px 0px #ffd93d;
+        }
+
+        .gallery-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .victory-card {
+            background: white;
+            border: 4px solid #333;
+            border-radius: 20px;
+            padding: 1.5rem;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+
+        .victory-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+        }
+
+        .winner-badge {
+            position: absolute;
+            top: -10px;
+            right: -10px;
+            background: #ff6b6b;
+            color: white;
+            padding: 0.5rem;
+            border: 3px solid #333;
+            border-radius: 50%;
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+
+        .card-prompt {
+            font-size: 1.1rem;
+            font-weight: bold;
+            margin-bottom: 1rem;
+            color: #333;
+        }
+
+        .card-result {
+            background: #f8f9fa;
+            border: 2px solid #333;
+            border-radius: 10px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            min-height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Rules Styles */
+        .rules {
+            padding: 2rem 1rem;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+        }
+
+        .rules-container {
+            max-width: 800px;
+            margin: 0 auto;
+            text-align: center;
+        }
+
+        .rules-title {
+            font-size: 2rem;
+            font-weight: bold;
+            margin-bottom: 1.5rem;
+            text-shadow: 2px 2px 0px #333;
+        }
+
+        .rules-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .rule-item {
+            background: white;
+            color: #333;
+            padding: 1.5rem;
+            border: 4px solid #333;
+            border-radius: 20px;
+            font-weight: bold;
+            font-size: 1.1rem;
+        }
+
+        /* Footer Styles */
+        .footer {
+            background: #333;
+            color: white;
+            padding: 2rem 1rem;
+            text-align: center;
+        }
+
+        .footer-buttons {
+            margin-bottom: 1.5rem;
+        }
+
+        .footer-btn {
+            background: #4ecdc4;
+            color: white;
+            border: 3px solid white;
+            padding: 1rem 2rem;
+            font-size: 1.1rem;
+            font-weight: bold;
+            border-radius: 15px;
+            cursor: pointer;
+            margin: 0 1rem;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+        }
+
+        .footer-btn:hover {
+            background: white;
+            color: #4ecdc4;
+            transform: translateY(-2px);
+        }
+
+        .footer-text {
+            font-size: 1.2rem;
+            font-weight: bold;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .logo {
+                font-size: 2rem;
+            }
+
+            .fighters {
+                grid-template-columns: 1fr;
+            }
+
+            .results {
+                grid-template-columns: 1fr;
+            }
+
+            .rules-list {
+                grid-template-columns: 1fr;
+            }
+
+            .footer-btn {
+                display: block;
+                margin: 0.5rem auto;
+                width: 200px;
+            }
+        }
+
+        /* Smooth Scrolling */
+        html {
+            scroll-behavior: smooth;
+        }
+    </style>
+  <style>@view-transition { navigation: auto; }</style>
+  <script src="/_sdk/data_sdk.js" type="text/javascript"></script>
+  <script src="/_sdk/element_sdk.js" type="text/javascript"></script>
+  <script src="https://cdn.tailwindcss.com" type="text/javascript"></script>
+ </head>
+ <body><!-- Header -->
+  <header class="header">
+   <h1 class="logo">⚔️ PROMPT FIGHT CLUB ⚔️</h1>
+   <p class="subtitle">Where AIs battle on prompts</p><button class="start-btn" onclick="scrollToArena()">Start Fight</button>
+  </header><!-- Arena -->
+  <main class="arena" id="arena">
+   <div class="arena-ring">
+    <div class="round-title">
+     🥊 Round 1: Create a funny cat meme 🥊
+    </div>
+    <div class="fighters">
+     <div class="fighter chatgpt"><span class="fighter-face">🤖</span>
+      <div class="fighter-name">
+       ChatGPT
+      </div>
+      <div class="fighter-type">
+       TEXT
+      </div>
+     </div>
+     <div class="fighter midjourney"><span class="fighter-face">🎨</span>
+      <div class="fighter-name">
+       MidJourney
+      </div>
+      <div class="fighter-type">
+       IMAGE
+      </div>
+     </div>
+    </div>
+    <div class="results">
+     <div class="speech-bubble">
+      <div class="result-text">
+       "Why don't cats ever win poker? Because they're always showing their hand... I mean, paw! 🐾"
+      </div>
+     </div>
+     <div class="speech-bubble">
+      <div class="result-image">
+       🐱‍💻
+      </div>
+     </div>
+    </div>
+    <div class="winner-section"><button class="choose-winner-btn" onclick="showComicEffect('POW!')">Choose ChatGPT</button> <button class="choose-winner-btn" onclick="showComicEffect('ZAP!')">Choose MidJourney</button>
+    </div>
+   </div>
+  </main><!-- Gallery -->
+  <section class="gallery">
+   <h2 class="gallery-title">🏆 Hall of Fame 🏆</h2>
+   <div class="gallery-grid">
+    <div class="victory-card">
+     <div class="winner-badge">
+      👑
+     </div>
+     <div class="card-prompt">
+      "Write a haiku about pizza"
+     </div>
+     <div class="card-result">
+      Cheese melts on warm dough<br>
+       Pepperoni circles dance<br>
+       Friday night heaven
+     </div>
+     <div style="text-align: center; font-weight: bold; color: #4ecdc4;">
+      ChatGPT Wins!
+     </div>
+    </div>
+    <div class="victory-card">
+     <div class="winner-badge">
+      🎨
+     </div>
+     <div class="card-prompt">
+      "Design a superhero logo"
+     </div>
+     <div class="card-result">
+      <div style="font-size: 3rem;">
+       ⚡🦸‍♂️⚡
+      </div>
+     </div>
+     <div style="text-align: center; font-weight: bold; color: #667eea;">
+      DALL·E Wins!
+     </div>
+    </div>
+    <div class="victory-card">
+     <div class="winner-badge">
+      🧠
+     </div>
+     <div class="card-prompt">
+      "Explain quantum physics like I'm 5"
+     </div>
+     <div class="card-result">
+      "Imagine tiny invisible LEGO blocks that can be in two places at once, like magic!"
+     </div>
+     <div style="text-align: center; font-weight: bold; color: #f093fb;">
+      Claude Wins!
+     </div>
+    </div>
+   </div>
+  </section><!-- Rules -->
+  <section class="rules">
+   <div class="rules-container">
+    <h2 class="rules-title">⚖️ Fight Club Rules ⚖️</h2>
+    <div class="rules-list">
+     <div class="rule-item">
+      📝 1 prompt = 1 round
+     </div>
+     <div class="rule-item">
+      👥 Users decide the winner
+     </div>
+     <div class="rule-item">
+      🔄 AIs may change style, but prompt stays the same
+     </div>
+    </div>
+   </div>
+  </section><!-- Footer -->
+  <footer class="footer">
+   <div class="footer-buttons"><button class="footer-btn" onclick="newFight()">New Fight</button> <button class="footer-btn" onclick="submitPrompt()">Submit a Prompt</button>
+   </div>
+   <p class="footer-text">Even AIs love challenges! 🤖❤️</p>
+  </footer>
+  <script>
+        function scrollToArena() {
+            document.getElementById('arena').scrollIntoView({ 
+                behavior: 'smooth' 
+            });
+        }
+
+        function showComicEffect(effect) {
+            const effectElement = document.createElement('div');
+            effectElement.className = 'comic-effect';
+            effectElement.textContent = effect;
+            document.body.appendChild(effectElement);
+            
+            setTimeout(() => {
+                document.body.removeChild(effectElement);
+            }, 1000);
+        }
+
+        function newFight() {
+            // Simulate starting a new fight
+            const prompts = [
+                "Create a motivational poster for procrastinators",
+                "Design a restaurant menu for aliens",
+                "Write a love song about WiFi",
+                "Explain social media to a medieval knight",
+                "Create a workout routine for couch potatoes"
+            ];
+            
+            const randomPrompt = prompts[Math.floor(Math.random() * prompts.length)];
+            document.querySelector('.round-title').textContent = `🥊 Round ${Math.floor(Math.random() * 10) + 1}: ${randomPrompt} 🥊`;
+            
+            // Scroll to arena
+            scrollToArena();
+            
+            // Show effect
+            showComicEffect('FIGHT!');
+        }
+
+        function submitPrompt() {
+            const prompt = window.prompt('Enter your creative prompt for the AIs to battle over:');
+            if (prompt && prompt.trim()) {
+                document.querySelector('.round-title').textContent = `🥊 New Challenge: ${prompt} 🥊`;
+                scrollToArena();
+                showComicEffect('BOOM!');
+            }
+        }
+
+        // Add some interactive animations
+        document.addEventListener('DOMContentLoaded', function() {
+            const fighters = document.querySelectorAll('.fighter');
+            fighters.forEach(fighter => {
+                fighter.addEventListener('mouseenter', function() {
+                    this.style.transform = 'scale(1.05) rotate(2deg)';
+                });
+                
+                fighter.addEventListener('mouseleave', function() {
+                    this.style.transform = 'scale(1) rotate(0deg)';
+                });
+            });
+        });
+    </script>
+ <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'99229aad04d45d40',t:'MTc2MTA2OTA5OS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>
